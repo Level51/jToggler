@@ -1,0 +1,15 @@
+{
+  "name": "jToggler",
+  "version": "0.1.0",
+  "authors": [
+    "Daniel Kliemsch <dk@lvl51.de>",
+    "Julian Scheuchenzuber <js@lvl51.de>"
+  ],
+  "description": "A jQuery UI plugin, that creates a on/off toggler inside a specified container element.",
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "jqueryui": "~1.11.4",
+    "jquery.ui.touch-punch.dk": "~0.3.3",
+    "jquery-touchswipe": "~1.6.9"
+  }
+}

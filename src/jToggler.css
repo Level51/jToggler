@@ -1,0 +1,60 @@
+.transition {
+  -moz-transition: all 0.07s ease-in 0s;
+  -webkit-transition: all 0.07s ease-in 0s;
+  -o-transition: all 0.07s ease-in 0s;
+  transition: all 0.07s ease-in 0s;
+}
+.borderbox {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.onoffswitch {
+  position: relative;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+  display: none;
+}
+.onoffswitch-label {
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+}
+.onoffswitch-inner {
+  width: 200%;
+  margin-left: -100%;
+  -moz-transition: all 0.07s ease-in 0s;
+  -webkit-transition: all 0.07s ease-in 0s;
+  -o-transition: all 0.07s ease-in 0s;
+  transition: all 0.07s ease-in 0s;
+}
+.onoffswitch-inner:before,
+.onoffswitch-inner:after {
+  float: left;
+  width: 50%;
+  padding: 0;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.onoffswitch-inner:after {
+  text-align: right;
+}
+.onoffswitch-switch {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  -moz-transition: all 0.07s ease-in 0s;
+  -webkit-transition: all 0.07s ease-in 0s;
+  -o-transition: all 0.07s ease-in 0s;
+  transition: all 0.07s ease-in 0s;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+  margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+  right: 0 !important;
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<!--[if IE 8 ]><html class="ie" xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html class="no-js" xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de"><!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <title>Title</title>
+    <meta name="author" content="Julian Scheuchenzuber <js@lvl51.de>, Daniel Kliemsch <dk@lvl51.de>">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
+    <![endif]-->
+
+    <!-- vendor script includes -->
+    <script type="text/javascript" src="../vendor/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="../vendor/jqueryui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="../vendor/jquery.ui.touch-punch.dk/jquery.ui.touch-punch.dk.js"></script>
+    <script type="text/javascript" src="../vendor/jquery-touchswipe/jquery.touchSwipe.min.js"></script>
+
+    <!-- jToggler include -->
+    <link rel="stylesheet" type="text/css" href="../src/jToggler.css">
+    <script type="text/javascript" src="../src/jToggler.js"></script>
+
+    <script type="text/javascript">
+        $(function(){
+            var jt = $('#sample').jToggler({
+                size: {
+                    width: '80px',
+                    height: '30px',
+                    switchSize: '20px'
+                },
+                font: {
+                    size: '14px',
+                    spacing: '14px'
+                },
+                // insert custom options here
+                statusChange: function(event, data){
+                    console.log('changed status to ' + data.status);
+                }
+            });
+            jt.jToggler('makeSwipeable');
+        });
+    </script>
+
+</head>
+<body>
+<!--[if lt IE 8]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
+
+    <h1>jToggler Example</h1>
+
+    <!-- container for jToggler instance -->
+    <div id="sample" class="jToggler"></div>
+
+</body>
+</html>
