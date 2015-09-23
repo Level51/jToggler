@@ -176,75 +176,199 @@
         },
 
         switchRightOffset: function(){
-            return (parseInt(this.options.size.width) - (parseInt(this.options.size.switchSize) + (((parseInt(this.options.size.height) - parseInt(this.options.size.switchSize)) / 2)*2) + 4));
+            return (parseInt(this.options.size.width) - (parseInt(this.options.size.height) + 4));
         },
 
         makeSwipeable: function() {
 
             var _this = this;
+            var hasMoved = false;
+            var mousePressed = false;
+            var start = null;
+            var onoffswitch = _this.element.find('.onoffswitch-switch');
 
             // unbind default actions
             _this.element.off().unbind();
 
-            var onoffswitch = _this.element.find('.onoffswitch-switch');
-            var switchInner = _this.element.find('.onoffswitch-inner');
+            // Check if touch events or pointer are supported
+            touch = 'ontouchstart' in window;
+            iePointerOld = window.navigator.msPointerEnabled && !window.navigator.pointerEnabled;
+            iePointerNew = window.navigator.pointerEnabled || window.navigator.msPointerEnabled;
 
-            // make the container swipeable
-            _this.element.swipe({
-                threshold: 15, // min pixels must be moved before swipe event is triggered
-                triggerOnTouchLeave: true,
-                excludedElements: "",
-                // callback if a swipe was detected
-                swipe:function(event, direction, distance, duration, fingerCount) {
-                    if (direction == "left") {
-                        onoffswitch.attr('style', '');
-                        switchInner.attr('style', '');
-                        _this.status(false);
-                    } else if (direction == "right") {
-                        onoffswitch.attr('style', '');
-                        switchInner.attr('style', '');
-                        _this.status(true);
+            // Supports touch events? Affects most touch devices except ones with IE
+            if ('ontouchstart' in window) {
+
+                // Prevent browsers default actions (and removes the 300ms delay)
+                _this.element.css('touch-action', 'none');
+
+                _this.element.on('touchstart', function (e) {
+                    _this._setSwitchPosition(e, function (pos) {
+                        start = pos;
+                    });
+                });
+
+                _this.element.on('touchmove', function (e) {
+                    e.preventDefault(); // Prevent scrolling
+                    _this._setSwitchPosition(e);
+                    hasMoved = true;
+                });
+
+                _this.element.on('touchend', function (e) {
+                    if (!hasMoved) // Was just a click
+                        _this._changeStatus();
+                    else // Was a move
+                        _this._setSwitchPosition(e, function (pos) {
+                            // Check if moved to left or right, change the state only if differs
+                            var newState = (pos <= start);
+                            if (newState != _this.status())
+                                _this._changeStatus();
+                        });
+
+                    // Reset
+                    onoffswitch.attr('style', '');
+                    hasMoved = false;
+                });
+            }
+            else if (iePointerOld || iePointerNew) { // Pointer events for IE
+                var blocked = false;
+
+                /* Unimpressive but very important line, without this the pointermove event isn't fired on touch devices
+                 Thanks to Patrick H. Lauke, check the article here: http://webkrauts.de/artikel/2013/drei-unter-einem-dach */
+                _this.element.css('touch-action', 'none');
+
+                // Distinguish between old ms prefixed and new (>= IE 11) events
+                var downE = (iePointerNew) ? 'pointerdown' : 'MSPointerDown';
+                var moveE = (iePointerNew) ? 'pointermove' : 'MSPointerMove';
+                var upE = (iePointerNew) ? 'pointerup pointerleave' : 'MSPointerUp MSPointerLeave';
+
+                _this.element.on(downE, function (e) {
+                    blocked = false;
+                    mousePressed = true;
+
+                    _this._setSwitchPosition(e, function (pos) {
+                        start = pos;
+                    });
+                });
+
+                _this.element.on(moveE, function (e) {
+                    if (!mousePressed)
+                        return;
+
+                    _this._setSwitchPosition(e);
+                });
+
+                _this.element.on(upE, function (e) {
+                    if (blocked)
+                        return;
+
+                    // Block until next pointerdown, needed because IE fires both events on up (up and leave)
+                    blocked = true;
+
+                    var curr = _this._getSwitchPosition(e);
+
+                    // Check if the current position is in a range near the start, if so: handle as click
+                    if ( (start-5) >= curr <= (start+5) ) {
+                        _this._changeStatus();
                     }
-                },
-                // callback while swiping
-                swipeStatus:function(event, phase, direction, distance, duration, fingerCount) {
-
-                    // adjust the swipe handle
-                    if (direction == "left") {
-                        if (distance < _this.switchRightOffset()) {
-                            onoffswitch.attr('style', 'right: ' + distance + 'px !important');
-                            // switchInner.attr('style', 'margin-left: -' + distance);
-                        } else {
-                            onoffswitch.attr('style', 'right: ' + _this.switchRightOffset() + 'px !important');
-                        }
-
-                    } else if (direction == "right") {
-                        if (distance < _this.switchRightOffset()) {
-                            onoffswitch.attr('style', 'right: ' + (_this.switchRightOffset()-distance) + 'px !important');
-                            // switchInner.attr('style', 'margin-left: -' + (114 - distance));
-                        } else {
-                            onoffswitch.attr('style', 'right: ' + '0px !important');
-                        }
-
+                    else {
+                        // Otherwise the move was bigger, so check the direction and change the state only if differs
+                        var newState = (curr <= start);
+                        if (newState != _this.status())
+                            _this._changeStatus();
                     }
 
-                    // if user stops swiping before the threshold is reached, the cancel phase is entered
-                    // here we reset the handle position or change the status of the toggler if the distance was 0 (same as simple click event)
-                    if (phase == "cancel") {
-                        onoffswitch.attr('style', '');
-                        if (distance == 0) {
-                            if (_this.status() == true) {
-                                _this.status(false);
-                            } else {
-                                _this.status(true);
-                            }
-                        }
-                    }
+                    // Reset
+                    mousePressed = false;
+                    onoffswitch.attr('style', '');
+                });
+            }
+            else { // Default mouse events for non touch devices
 
-                }
-            });
+                _this.element.on('mousedown', function (e) {
+                    mousePressed = true;
+                    _this._setSwitchPosition(e, function (pos) {
+                        start = pos;
+                    });
+                });
+
+                _this.element.on('mousemove', function (e) {
+                    if (!mousePressed)
+                        return;
+
+                    _this._setSwitchPosition(e);
+                    hasMoved = true;
+                });
+
+                _this.element.on('mouseup mouseleave', function (e) {
+                    if (!mousePressed)
+                        return;
+
+                    if (!hasMoved) // Was just a click
+                        _this._changeStatus();
+                    else // Was a move
+                        _this._setSwitchPosition(e, function (pos) {
+                            var newState = (pos <= start);
+                            if (newState != _this.status())
+                                _this._changeStatus();
+                        });
+
+                    // Reset
+                    mousePressed = false;
+                    hasMoved = false;
+                    onoffswitch.attr('style', '');
+                });
+            }
+        },
+
+        _getSwitchPosition: function(e) {
+
+            // Get the event target
+            var t;
+            if ('ontouchstart' in window) {
+                t = e.originalEvent.touches[0];
+
+                // In Chrome the "touches" array isn't there on touchend, so get the changed touches
+                if (typeof(t) == "undefined")
+                    t = e.originalEvent.changedTouches[0];
+
+            } else {
+                // Take the whole event, for pointer (and mouse) events this should contain the coordinates
+                t = e;
+
+                // Check if the target contains the pageX, otherwise get the original event
+                if (typeof(t.pageX) == "undefined")
+                    t = e.originalEvent;
+            }
+
+            // Position of the event (inside the toggler, in px from the right border)
+            var eventPosition = this.element.outerWidth() - (t.pageX - this.element.offset().left);
+
+            // The dimens of the switch: Size + 2* Border + Margin (= height - switchSize)
+            var switchDimens = parseInt(this.options.size.switchSize) + parseInt(this.options.border.size) * 2 + (parseInt(this.options.size.height) - parseInt(this.options.size.switchSize));
+
+            // The final position - brings the center of the switch to the exact event position (as value from the right border inside the toggler)
+            var pos =  eventPosition - switchDimens / 2;
+
+            return pos;
+        },
+
+        _setSwitchPosition: function(e, callback){
+
+            var pos = this._getSwitchPosition(e);
+            var onoffswitch = this.element.find('.onoffswitch-switch');
+
+            // Update the switch position while in toggler boundaries (or set to left/right if outside)
+            if (pos < this.switchRightOffset() && pos >= 0)
+                onoffswitch.attr('style', 'right: ' + pos + 'px !important');
+            else if (pos < 0)
+                onoffswitch.attr('style', 'right: ' + 0 + 'px !important');
+            else
+                onoffswitch.attr('style', 'right: ' + this.switchRightOffset() + 'px !important');
+
+            // execute callback if given
+            if (typeof(callback) == "function")
+                callback(pos);
         }
-
     });
 
 }( jQuery ));

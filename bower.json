@@ -1,6 +1,6 @@
 {
   "name": "jToggler",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "authors": [
     "Daniel Kliemsch <dk@lvl51.de>",
     "Julian Scheuchenzuber <js@lvl51.de>"
@@ -9,7 +9,6 @@
   "dependencies": {
     "jquery": "~2.1.4",
     "jqueryui": "~1.11.4",
-    "jquery.ui.touch-punch.dk": "~0.3.3",
-    "jquery-touchswipe": "~1.6.9"
+    "jquery.ui.touch-punch.dk": "~0.3.3"
   }
 }

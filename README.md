@@ -28,7 +28,7 @@ You can also get the dependencies via bower.
 Same as status, but doesn't trigger the statusChanged callback
 
 #### makeSwipeable
-Allows to swipe the toggler. For this the jquery-touchswipe lib is necessary.
+Allows to swipe the toggler. Since v0.2.0 this is custom logic, so the the jquery-touchswipe lib isn't necessary anymore.
 
 ### Callback
 #### statusChange
@@ -39,4 +39,3 @@ triggered on every status change
 - jQuery
 - jQuery UI
 - jQuery UI Touch Punch
-- jQuery Touchswipe (just if toggler should be swipeable)
